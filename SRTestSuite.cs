@@ -19,13 +19,9 @@ namespace SR_APITest
         public void BeginTestSuite()
         {
 
-            
+
             log.CreateTestCaseLogFile();
-
-
-
-
-            //-------TestCase 1 : Test Sveriges Radio API URL response status ----------------
+            //-------Test Sveriges Radio API URL response status ----------------
 
             string xml = TestAPIStatus("http://api.sr.se/api/v2/channels");
 
@@ -69,12 +65,13 @@ namespace SR_APITest
 
                 int count = 0;
                 string chanID = "";
+                bool channelElements = true;
+                bool scheduleElements = true;
                 sr1.channels = new SRChannel[channelList.Count];
                 foreach (XmlNode channelInfo in channelList)
                 {
                     try
                     {
-
 
                         SRChannel channel = new SRChannel();
 
@@ -112,10 +109,7 @@ namespace SR_APITest
 
                         //--------------------------------------------------
 
-                        // channel.statKey = liveAudio[k].ChildNodes.Item(1).InnerText.Trim();
-
-                        //}
-
+                      
 
                         channel.scheduleURL = channelInfo["scheduleurl"].InnerText.Trim();
                         //---------------check schedule API for this channel------
@@ -125,8 +119,13 @@ namespace SR_APITest
                         }
                         catch (Exception e)
                         {
-                           // Console.WriteLine("Schedules for channel ID : " + channel.channelId + "are missing elements");
-                            log.Log("\r\nTC :: Check Schedule response elements >> ChannelID - "+ channel.channelId + " :: FAIL ");
+                            scheduleElements = false;
+                            log.Log("\r\nTC :: Check Schedule response elements >> ChannelID - " + channel.channelId + " :: FAIL ");
+                        }
+                        if(scheduleElements)
+                        {
+                            log.Log("\r\nTC :: Check Schedule response elements >> ChannelID - " + channel.channelId + " :: PASS ");
+
                         }
                         //-----------------------------------------------------
                         channel.channelType = channelInfo["channeltype"].InnerText.Trim();
@@ -136,9 +135,13 @@ namespace SR_APITest
                     }
                     catch (Exception e)
                     {
-                        //Console.WriteLine("Elements missing for channel ID :" + chanID);
+                        channelElements = false;
                         log.Log("\r\nTC :: Check Channel response elements >> Elements missing :: ChannelID - " + chanID + " :: FAIL ");
 
+                    }
+                    if(channelElements)
+                    {
+                        log.Log("\r\nTC :: Check Channel response elements >> Elements present :: ChannelID - " + chanID + " :: PASS ");
                     }
                 }
                 //----------Check statusCode of the next page---------
@@ -187,11 +190,13 @@ namespace SR_APITest
 
                 string progID = "";
                 int count = 0;
+                bool scheduleElements = true;
                 foreach (XmlNode scheduleInfo in scheduleList)
                 {
                     try
                     {
                         SREpisode episode = new SREpisode();
+
                         episode.programID = progID = scheduleInfo["program"].Attributes["id"].Value;
                         episode.programName = scheduleInfo["program"].Attributes["name"].Value;
                         episode.episodeID = scheduleInfo["episodeid"].InnerText.Trim();
@@ -200,7 +205,8 @@ namespace SR_APITest
                         episode.description = scheduleInfo["description"].InnerText.Trim();
                         episode.startTime = scheduleInfo["starttimeutc"].InnerText.Trim();
                         episode.endTime = scheduleInfo["endtimeutc"].InnerText.Trim();
-
+                        episode.imageURL = scheduleInfo["imageurl"].InnerText.Trim();
+                        episode.imageURLTemplate = scheduleInfo["imageurltemplate"].InnerText.Trim();
                         episode.channelID = scheduleInfo["channel "].Attributes["id"].Value;
                         episode.channelName = scheduleInfo["channel "].Attributes["name"].Value;
 
@@ -209,53 +215,54 @@ namespace SR_APITest
                         try
                         {
                             Assert.AreEqual(episode.channelID, channel.channelId);
-                            
+
                             Assert.AreEqual(episode.channelName, channel.channelName);
-                            log.Log("\r\nTC :: Match Program to Channel :: " + episode.programID + " :: FAIL");
+                            log.Log("\r\nTC :: Match Program to Channel :: " + episode.programID + " :: PASS");
                         }
                         catch (Exception e)
                         {
-                            log.Log("\r\nTC :: Match Program to Channel :: " +episode.programID+" :: FAIL" );
+                            log.Log("\r\nTC :: Match Program to Channel :: " + episode.programID + " :: FAIL");
 
-                            
+
                         }
 
                         //----------------------------------------------------------------------
-                        episode.imageURL = scheduleInfo["imageurl"].InnerText.Trim();
+                       
 
-                        //----------Check if image load is successful---------
+                        //----------Check if image load is successful----------------------------
 
                         TestAPIStatus(episode.imageURL);
 
-                        //----------------------------------------------------
-                        episode.imageURLTemplate = scheduleInfo["imageurltemplate"].InnerText.Trim();
-
+                        //-----------------------------------------------------------------------
+                        
 
                         srs.episodes[count++] = episode;
                     }
                     catch (Exception e)
                     {
-                        //Console.WriteLine(e.Message + "\nProgram ID :  " + progID + "  missing elements");
+                        scheduleElements = false;
                         log.Log("\r\nTC :: Check Schedule response elements >> Elements missing :: Program ID - " + progID + " :: FAIL ");
+                    }
+                    if(scheduleElements)
+                    {
+                        log.Log("\r\nTC :: Check Schedule response elements >> Elements present :: Program ID - " + progID + " :: PASS");
+
                     }
 
 
-
                 }
-
-
-
 
                 //----------Check statusCode of the next page---------
 
                 srs.xml = TestAPIStatus(srs.nextPage);
                 if (srs.xml == null)
                 {
-                    //Console.WriteLine("URL to nextpage failed");
+
                     return null;
                 }
                 //----------------------------------------------------
-               
+
+
             } while (srs.currentPage < srs.totalPages);
 
 
@@ -282,7 +289,7 @@ namespace SR_APITest
             }
             catch (Exception statusFail)
             {
-                
+
                 log.Log("\r\nTC :: Check URL Response >> " + API + " :: FAIL :: Statuscode = " + status);
 
             }
@@ -290,6 +297,8 @@ namespace SR_APITest
             return xml;
 
         }
+
+       
 
     }
 }
