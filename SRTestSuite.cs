@@ -255,7 +255,7 @@ namespace SR_APITest
                     return null;
                 }
                 //----------------------------------------------------
-                //if (srs.currentPage == srs.totalPages) break;
+               
             } while (srs.currentPage < srs.totalPages);
 
 
@@ -282,7 +282,7 @@ namespace SR_APITest
             }
             catch (Exception statusFail)
             {
-                //Console.WriteLine("URL : " + API + "\nStatus Code : " + status + "\n" + statusFail.Message);
+                
                 log.Log("\r\nTC :: Check URL Response >> " + API + " :: FAIL :: Statuscode = " + status);
 
             }
@@ -290,22 +290,6 @@ namespace SR_APITest
             return xml;
 
         }
-
-        //public object getPaginationInfo(XmlNodeList pageInfo, Object sr1)
-        //{
-        //    for (int i = 0; i < pageInfo.Count; i++)
-        //    {
-
-        //        sr1.currentPage = Convert.ToInt32(pageInfo[i].ChildNodes.Item(0).InnerText.Trim());
-        //        sr1.pageSize = Convert.ToInt32(pageInfo[i].ChildNodes.Item(1).InnerText.Trim());
-        //        sr1.totalPages = Convert.ToInt32(pageInfo[i].ChildNodes.Item(3).InnerText.Trim());
-        //        sr1.nextPage = pageInfo[i].ChildNodes.Item(4).InnerText.Trim();
-        //        if (sr1.currentPage != 1)
-        //        {
-        //            sr1.previousPage = pageInfo[i].ChildNodes.Item(5).InnerText.Trim();
-        //        }
-        //    }
-        //}
 
     }
 }
