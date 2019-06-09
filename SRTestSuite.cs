@@ -13,18 +13,24 @@ namespace SR_APITest
     [TestClass]
     public class SRTestSuite
     {
+        logTestCaseResults log = new logTestCaseResults();
         [TestMethod]
 
         public void BeginTestSuite()
         {
 
+            
+            log.CreateTestCaseLogFile();
+
+
+
+
             //-------TestCase 1 : Test Sveriges Radio API URL response status ----------------
 
             string xml = TestAPIStatus("http://api.sr.se/api/v2/channels");
 
-            //---------------------------------------------------------------------------------
+            //--------------------------------------------------------------------------------
 
-            //if Successful, test further
 
             if (xml != null)
             {
@@ -119,7 +125,8 @@ namespace SR_APITest
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Schedules for channel ID : " + channel.channelId + "are missing elements");
+                           // Console.WriteLine("Schedules for channel ID : " + channel.channelId + "are missing elements");
+                            log.Log("\r\nTC :: Check Schedule response elements >> ChannelID - "+ channel.channelId + " :: FAIL ");
                         }
                         //-----------------------------------------------------
                         channel.channelType = channelInfo["channeltype"].InnerText.Trim();
@@ -129,7 +136,9 @@ namespace SR_APITest
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Elements missing for channel ID :" + chanID);
+                        //Console.WriteLine("Elements missing for channel ID :" + chanID);
+                        log.Log("\r\nTC :: Check Channel response elements >> Elements missing :: ChannelID - " + chanID + " :: FAIL ");
+
                     }
                 }
                 //----------Check statusCode of the next page---------
@@ -137,7 +146,6 @@ namespace SR_APITest
                     sr1.xml = TestAPIStatus(sr1.nextPage);
                 if (sr1.xml == null)
                 {
-                    Console.WriteLine("URL to nextpage failed");
                     return;
                 }
                 //----------------------------------------------------
@@ -201,12 +209,15 @@ namespace SR_APITest
                         try
                         {
                             Assert.AreEqual(episode.channelID, channel.channelId);
+                            
                             Assert.AreEqual(episode.channelName, channel.channelName);
+                            log.Log("\r\nTC :: Match Program to Channel :: " + episode.programID + " :: FAIL");
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Program Schedule does not belong to the correct channel\n" + e.Message);
+                            log.Log("\r\nTC :: Match Program to Channel :: " +episode.programID+" :: FAIL" );
 
+                            
                         }
 
                         //----------------------------------------------------------------------
@@ -224,7 +235,8 @@ namespace SR_APITest
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message + "\nProgram ID :  " + progID + "  missing elements");
+                        //Console.WriteLine(e.Message + "\nProgram ID :  " + progID + "  missing elements");
+                        log.Log("\r\nTC :: Check Schedule response elements >> Elements missing :: Program ID - " + progID + " :: FAIL ");
                     }
 
 
@@ -239,7 +251,7 @@ namespace SR_APITest
                 srs.xml = TestAPIStatus(srs.nextPage);
                 if (srs.xml == null)
                 {
-                    Console.WriteLine("URL to nextpage failed");
+                    //Console.WriteLine("URL to nextpage failed");
                     return null;
                 }
                 //----------------------------------------------------
@@ -266,10 +278,12 @@ namespace SR_APITest
             try
             {
                 Assert.AreEqual(status, "OK");
+                log.Log("\r\nTC :: Check URL Response >> " + API + " :: PASS");
             }
             catch (Exception statusFail)
             {
-                Console.WriteLine("URL : " + API + "\nStatus Code : " + status + "\n" + statusFail.Message);
+                //Console.WriteLine("URL : " + API + "\nStatus Code : " + status + "\n" + statusFail.Message);
+                log.Log("\r\nTC :: Check URL Response >> " + API + " :: FAIL :: Statuscode = " + status);
 
             }
 
