@@ -46,6 +46,10 @@ Below is a short description of what each file in the repo is:
 - **logTestCaseResults.cs** : 
   This class holds the methods used to create the Test Case Log file and write into them. The SRTestSuite.cs class makes use of the methods in this function to log test cases under the file name *TestCaseResults.txt*.
   This file is created in the directory *C:\SRAPITestSuiteResults_ddmmyyyy*
+
+- **Test Cases.md** :  Contains list of Test Cases implemented.
+
+- **Open Items.md** : Outlines all questions and doubts related to the project.
   
 ### Deployment
 
@@ -54,6 +58,7 @@ Below is a short description of what each file in the repo is:
 - Importing the project code from this GITHub repo 
 - Hit run!
 - Find the TestResults in the directory *C:\SRAPITestSuiteResults_ddmmyyyy\TestCaseResults.txt*.
+
 
 ### Acknowledgements
 
